@@ -1,6 +1,9 @@
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using PromptVault.Api.Database;
 using PromptVault.Api.Database.DatabaseSeeder;
+using PromptVault.Api.Services;
+using PromptVault.Api.Services.Interfaces;
 
 namespace PromptVault.Api
 {
@@ -11,6 +14,18 @@ namespace PromptVault.Api
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
+
+            // Register all FluentValidation validators from this assembly
+            builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+
+            // Add automapper and config with the AutoMapperProfile.cs class
+            builder.Services.AddAutoMapper(cfg =>
+                cfg.AddProfile<PromptVault.Api.AutoMapper.AutoMapperProfile>());
+
+            // Register services with interface bindings
+            builder.Services.AddScoped<IPromptService, PromptService>();
+            builder.Services.AddScoped<ITagService, TagService>();
+            builder.Services.AddScoped<ITestResultService, TestResultService>();
 
             builder.Services.AddControllers();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
