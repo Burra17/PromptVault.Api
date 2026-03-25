@@ -1,3 +1,6 @@
+using Microsoft.EntityFrameworkCore;
+using PromptVault.Api.Database;
+using PromptVault.Api.Database.DatabaseSeeder;
 
 namespace PromptVault.Api
 {
@@ -13,7 +16,21 @@ namespace PromptVault.Api
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
 
+            //Connection string
+            string connectionString = builder.Configuration.GetConnectionString("DefaultConnection")!;
+
+            // Database connection
+            builder.Services.AddDbContext<AppDbContext>(options =>
+                options.UseSqlServer(connectionString));
+
             var app = builder.Build();
+
+            // Start seeder when program starts
+            using (var scope = app.Services.CreateScope())
+            {
+                var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+                Seeder.Seed(context);
+            }
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
