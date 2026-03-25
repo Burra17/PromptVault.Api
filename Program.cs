@@ -2,6 +2,8 @@ using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using PromptVault.Api.Database;
 using PromptVault.Api.Database.DatabaseSeeder;
+using PromptVault.Api.Middleware;
+using PromptVault.Api.Configuration;
 using PromptVault.Api.Services;
 using PromptVault.Api.Services.Interfaces;
 
@@ -21,6 +23,10 @@ namespace PromptVault.Api
             // Add automapper and config with the AutoMapperProfile.cs class
             builder.Services.AddAutoMapper(cfg =>
                 cfg.AddProfile<PromptVault.Api.AutoMapper.AutoMapperProfile>());
+
+            // Bind OpenAI settings from config/user secrets and register HttpClient for OpenAiService
+            builder.Services.Configure<OpenAiSettings>(builder.Configuration.GetSection("OpenAI"));
+            builder.Services.AddHttpClient<IOpenAiService, OpenAiService>();
 
             // Register services with interface bindings
             builder.Services.AddScoped<IPromptService, PromptService>();
@@ -52,6 +58,9 @@ namespace PromptVault.Api
             {
                 app.MapOpenApi();
             }
+
+            // Global exception handler — must be first to catch all exceptions
+            app.UseMiddleware<ExceptionHandlingMiddleware>();
 
             app.UseHttpsRedirection();
 

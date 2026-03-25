@@ -1,0 +1,213 @@
+{
+	"info": {
+		"name": "PromptVault API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:5212"
+		}
+	],
+	"item": [
+		{
+			"name": "Prompts",
+			"item": [
+				{
+					"name": "Get All Prompts",
+					"request": {
+						"method": "GET",
+						"url": "{{baseUrl}}/api/prompts"
+					}
+				},
+				{
+					"name": "Get Prompt By ID",
+					"request": {
+						"method": "GET",
+						"url": "{{baseUrl}}/api/prompts/1"
+					}
+				},
+				{
+					"name": "Get Top Rated Prompts",
+					"request": {
+						"method": "GET",
+						"url": "{{baseUrl}}/api/prompts/top-rated"
+					}
+				},
+				{
+					"name": "Create Prompt",
+					"request": {
+						"method": "POST",
+						"url": "{{baseUrl}}/api/prompts",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"text\": \"Write a poem about space\",\n  \"category\": \"Creative\",\n  \"authorNote\": \"Works best with GPT-4\",\n  \"isPublic\": true,\n  \"tagNames\": [\"AI\", \"Fun\"]\n}"
+						}
+					}
+				},
+				{
+					"name": "Update Prompt",
+					"request": {
+						"method": "PUT",
+						"url": "{{baseUrl}}/api/prompts/1",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"text\": \"Explain quantum computing to a 5 year old\",\n  \"category\": \"Education\",\n  \"authorNote\": \"Updated version\",\n  \"isPublic\": false,\n  \"tagNames\": [\"Science\", \"Fun\"]\n}"
+						}
+					}
+				},
+				{
+					"name": "Delete Prompt",
+					"request": {
+						"method": "DELETE",
+						"url": "{{baseUrl}}/api/prompts/1"
+					}
+				},
+				{
+					"name": "Run Prompt (OpenAI)",
+					"request": {
+						"method": "POST",
+						"url": "{{baseUrl}}/api/prompts/1/run"
+					}
+				}
+			]
+		},
+		{
+			"name": "Tags",
+			"item": [
+				{
+					"name": "Get All Tags",
+					"request": {
+						"method": "GET",
+						"url": "{{baseUrl}}/api/tags"
+					}
+				},
+				{
+					"name": "Get Tag By ID",
+					"request": {
+						"method": "GET",
+						"url": "{{baseUrl}}/api/tags/1"
+					}
+				},
+				{
+					"name": "Create Tag",
+					"request": {
+						"method": "POST",
+						"url": "{{baseUrl}}/api/tags",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Testing\"\n}"
+						}
+					}
+				},
+				{
+					"name": "Delete Tag",
+					"request": {
+						"method": "DELETE",
+						"url": "{{baseUrl}}/api/tags/1"
+					}
+				}
+			]
+		},
+		{
+			"name": "Test Results",
+			"item": [
+				{
+					"name": "Get Results By Prompt ID",
+					"request": {
+						"method": "GET",
+						"url": "{{baseUrl}}/api/testresults/prompt/1"
+					}
+				},
+				{
+					"name": "Create Test Result",
+					"request": {
+						"method": "POST",
+						"url": "{{baseUrl}}/api/testresults",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"output\": \"Here is a poem about space...\",\n  \"rating\": 5,\n  \"modelUsed\": \"gpt-4o\",\n  \"promptId\": 1\n}"
+						}
+					}
+				},
+				{
+					"name": "Delete Test Result",
+					"request": {
+						"method": "DELETE",
+						"url": "{{baseUrl}}/api/testresults/1"
+					}
+				}
+			]
+		},
+		{
+			"name": "Validation & Error Handling",
+			"item": [
+				{
+					"name": "Create Prompt - Empty Body (400)",
+					"request": {
+						"method": "POST",
+						"url": "{{baseUrl}}/api/prompts",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{}"
+						}
+					}
+				},
+				{
+					"name": "Get Prompt - Not Found (404)",
+					"request": {
+						"method": "GET",
+						"url": "{{baseUrl}}/api/prompts/9999"
+					}
+				},
+				{
+					"name": "Create Test Result - Invalid Rating (400)",
+					"request": {
+						"method": "POST",
+						"url": "{{baseUrl}}/api/testresults",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"output\": \"Test\",\n  \"rating\": 10,\n  \"modelUsed\": \"gpt-4o\",\n  \"promptId\": 1\n}"
+						}
+					}
+				}
+			]
+		}
+	]
+}

@@ -3,6 +3,7 @@ using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using PromptVault.Api.Database;
 using PromptVault.Api.Dtos.Prompt;
+using PromptVault.Api.Dtos.TestResults;
 using PromptVault.Api.Models;
 using PromptVault.Api.Services.Interfaces;
 
@@ -16,18 +17,21 @@ public class PromptService : IPromptService
     private readonly IMapper _mapper;
     private readonly IValidator<CreatePromptDto> _createValidator;
     private readonly IValidator<UpdatePromptDto> _updateValidator;
+    private readonly IOpenAiService _openAiService;
 
     // DI container automatically provides these dependencies (registered in Program.cs)
     public PromptService(
         AppDbContext context,
         IMapper mapper,
         IValidator<CreatePromptDto> createValidator,
-        IValidator<UpdatePromptDto> updateValidator)
+        IValidator<UpdatePromptDto> updateValidator,
+        IOpenAiService openAiService)
     {
         _context = context;
         _mapper = mapper;
         _createValidator = createValidator;
         _updateValidator = updateValidator;
+        _openAiService = openAiService;
     }
 
     // Fetches all prompts with their related tags and test results.
@@ -152,6 +156,34 @@ public class PromptService : IPromptService
         await _context.SaveChangesAsync();
 
         return await GetByIdAsync(prompt.Id);
+    }
+
+    // Sends the prompt text to OpenAI GPT and saves the AI response as a new TestResult.
+    // Rating is set to 0 (not yet rated by user).
+    public async Task<TestResultResponseDto> RunAsync(int id)
+    {
+        var prompt = await _context.Prompts.FindAsync(id);
+
+        if (prompt == null)
+            throw new KeyNotFoundException($"Prompt with ID {id} was not found.");
+
+        // Call OpenAI API with the prompt text
+        var output = await _openAiService.GetCompletionAsync(prompt.Text);
+
+        // Save the AI response as a TestResult
+        var testResult = new TestResult
+        {
+            PromptId = prompt.Id,
+            Output = output,
+            Rating = 0, // Not rated yet — user can update later
+            ModelUsed = "gpt-4o-mini",
+            CreatedAt = DateTime.UtcNow
+        };
+
+        _context.Results.Add(testResult);
+        await _context.SaveChangesAsync();
+
+        return _mapper.Map<TestResultResponseDto>(testResult);
     }
 
     // Deletes a prompt by ID. Throws KeyNotFoundException if not found.

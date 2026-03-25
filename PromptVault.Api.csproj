@@ -4,6 +4,7 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>07110969-1004-429b-b927-9f7fd5931e35</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -26,6 +27,8 @@
 
   <ItemGroup>
     <Folder Include="Controllers\" />
+    <Folder Include="Middleware\" />
+    <Folder Include="Postman\" />
     <Folder Include="Services\Interfaces\" />
   </ItemGroup>
 
